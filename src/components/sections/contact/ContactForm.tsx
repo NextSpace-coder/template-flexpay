@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+import { useContactSubmit } from "@/hooks/useContact";
 
 const ContactForm: FC = () => {
   const [formData, setFormData] = useState({
@@ -13,8 +13,8 @@ const ContactForm: FC = () => {
     subject: "",
     message: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+
+  const contactSubmit = useContactSubmit();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -23,53 +23,32 @@ const ContactForm: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
+    
+    console.log("正在提交联系表单:", formData);
+    
     try {
-      console.log("Submitting contact form:", formData);
-      
-      const { data, error } = await supabase
-        .from("b0b237ee-54c0-4581-9b81-d9e7327dfe6c_contact_submissions")
-        .insert([{
-          full_name: formData.fullName,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-        }])
-        .select();
-
-      if (error) {
-        console.error("Contact form submission error:", error);
-        toast({
-          title: "Submission failed",
-          description: "Unable to submit your message. Please try again.",
-          variant: "destructive",
-        });
-      } else {
-        console.log("Contact form submission successful:", data);
-        toast({
-          title: "Message sent!",
-          description: "Thank you for your message. We'll get back to you soon.",
-          variant: "default",
-        });
-        setFormData({
-          fullName: "",
-          email: "",
-          subject: "",
-          message: "",
-        });
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
+      await contactSubmit.mutateAsync({
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
       });
-    } finally {
-      setIsSubmitting(false);
+      
+      // 成功后重置表单
+      setFormData({
+        fullName: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    } catch (error) {
+      // 错误处理已在hook中完成
+      console.error("联系表单提交失败:", error);
     }
   };
+
+  const isLoading = contactSubmit.isPending;
+  const isFormValid = formData.fullName.trim() && formData.email.trim() && formData.subject.trim();
 
   return (
     <div className="bg-white rounded-2xl p-8 shadow-lg">
@@ -89,7 +68,7 @@ const ContactForm: FC = () => {
             onChange={handleInputChange}
             className="mt-1"
             required
-            disabled={isSubmitting}
+            disabled={isLoading}
           />
         </div>
 
@@ -106,7 +85,7 @@ const ContactForm: FC = () => {
             onChange={handleInputChange}
             className="mt-1"
             required
-            disabled={isSubmitting}
+            disabled={isLoading}
           />
         </div>
 
@@ -123,7 +102,7 @@ const ContactForm: FC = () => {
             onChange={handleInputChange}
             className="mt-1"
             required
-            disabled={isSubmitting}
+            disabled={isLoading}
           />
         </div>
 
@@ -138,20 +117,27 @@ const ContactForm: FC = () => {
             value={formData.message}
             onChange={handleInputChange}
             className="mt-1 min-h-[120px]"
-            disabled={isSubmitting}
+            disabled={isLoading}
           />
         </div>
 
         <Button 
           type="submit" 
+          disabled={isLoading || !isFormValid}
           className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={isSubmitting}
         >
-          {isSubmitting ? "Submitting..." : "Submit"}
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              发送中...
+            </>
+          ) : (
+            "Submit"
+          )}
         </Button>
       </form>
     </div>
   );
 };
 
-export default ContactForm;
+export default ContactForm; 

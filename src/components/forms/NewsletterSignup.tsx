@@ -1,60 +1,30 @@
 import { useState } from "react";
-import { Send } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Send, Loader2 } from "lucide-react";
+import { useNewsletterSubscribe } from "@/hooks/useNewsletter";
 
 const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const newsletterSubscribe = useNewsletterSubscribe();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    
+    if (!email.trim()) {
+      return;
+    }
 
+    console.log("正在订阅邮件列表:", email);
+    
     try {
-      console.log("Submitting newsletter subscription:", email);
-      
-      const { data, error } = await supabase
-        .from("b0b237ee-54c0-4581-9b81-d9e7327dfe6c_newsletter_subscriptions")
-        .insert([{ email }])
-        .select();
-
-      if (error) {
-        console.error("Newsletter subscription error:", error);
-        if (error.code === "23505") {
-          toast({
-            title: "Already subscribed",
-            description: "This email is already subscribed to our newsletter.",
-            variant: "default",
-          });
-        } else {
-          toast({
-            title: "Subscription failed",
-            description: "Unable to subscribe. Please try again.",
-            variant: "destructive",
-          });
-        }
-      } else {
-        console.log("Newsletter subscription successful:", data);
-        toast({
-          title: "Successfully subscribed!",
-          description: "Thank you for subscribing to our newsletter.",
-          variant: "default",
-        });
-        setEmail("");
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
+      await newsletterSubscribe.mutateAsync({ email: email.trim() });
+      setEmail(""); // 成功后清空输入框
+    } catch (error) {
+      // 错误处理已在hook中完成
+      console.error("邮件订阅失败:", error);
     }
   };
+
+  const isLoading = newsletterSubscribe.isPending;
 
   return (
     <section className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-16">
@@ -76,16 +46,20 @@ const NewsletterSignup = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your Email..."
-                className="flex-1 px-4 py-3 rounded-l-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="flex-1 px-4 py-3 rounded-l-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 required
-                disabled={isSubmitting}
+                disabled={isLoading}
               />
               <button
                 type="submit"
+                disabled={isLoading || !email.trim()}
                 className="bg-black text-white px-6 py-3 rounded-r-lg hover:bg-gray-800 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSubmitting}
               >
-                <Send className="w-5 h-5" />
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
               </button>
             </form>
           </div>
@@ -95,4 +69,4 @@ const NewsletterSignup = () => {
   );
 };
 
-export default NewsletterSignup;
+export default NewsletterSignup; 

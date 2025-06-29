@@ -1,17 +1,41 @@
 import { Link } from 'react-router-dom';
-import { 
-  Facebook, 
-  Twitter, 
-  Instagram, 
-  Linkedin, 
-  ArrowRight,
-  Mail
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Mail,
+  Loader2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useNewsletterSubscribe } from "@/hooks/useNewsletter";
+import { useState } from 'react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState("");
+  const newsletterSubscribe = useNewsletterSubscribe();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email.trim()) {
+      return;
+    }
+
+    console.log("正在订阅邮件列表:", email);
+
+    try {
+      await newsletterSubscribe.mutateAsync({ email: email.trim() });
+      setEmail(""); // 成功后清空输入框
+    } catch (error) {
+      // 错误处理已在hook中完成
+      console.error("邮件订阅失败:", error);
+    }
+  };
+
+  const isLoading = newsletterSubscribe.isPending;
 
   return (
     <footer className="bg-card border-t border-border/40 pt-16 pb-8">
@@ -20,43 +44,43 @@ const Footer = () => {
           {/* Logo and About */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center mb-6">
-              <img 
-                src="/images/logo.png" 
-                alt="FlexPay Logo" 
-                className="h-16 w-auto" 
+              <img
+                src="/images/logo.png"
+                alt="FlexPay Logo"
+                className="h-16 w-auto"
               />
             </Link>
             <p className="text-foreground/70 mb-6 max-w-md">
               FlexPay is a comprehensive payment platform that helps businesses streamline their payment processes with secure, easy-to-use solutions.
             </p>
             <div className="flex space-x-4">
-              <a 
-                href="https://facebook.com" 
-                target="_blank" 
+              <a
+                href="https://facebook.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="h-10 w-10 rounded-full bg-background flex items-center justify-center hover:bg-primary/20 transition-colors"
               >
                 <Facebook className="h-5 w-5 text-foreground/70" />
               </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
+              <a
+                href="https://twitter.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="h-10 w-10 rounded-full bg-background flex items-center justify-center hover:bg-primary/20 transition-colors"
               >
                 <Twitter className="h-5 w-5 text-foreground/70" />
               </a>
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
+              <a
+                href="https://instagram.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="h-10 w-10 rounded-full bg-background flex items-center justify-center hover:bg-primary/20 transition-colors"
               >
                 <Instagram className="h-5 w-5 text-foreground/70" />
               </a>
-              <a 
-                href="https://linkedin.com" 
-                target="_blank" 
+              <a
+                href="https://linkedin.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="h-10 w-10 rounded-full bg-background flex items-center justify-center hover:bg-primary/20 transition-colors"
               >
@@ -135,20 +159,36 @@ const Footer = () => {
             <p className="text-foreground/70 mb-4">
               Subscribe to our newsletter to get the latest updates.
             </p>
-            <div className="flex flex-col space-y-3">
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/50" />
-                <Input 
-                  type="email" 
-                  placeholder="Your email" 
-                  className="pl-10 bg-background border-border/40 focus:border-primary"
-                />
+            <form onSubmit={handleSubmit} className="flex">
+              <div className="flex flex-col space-y-3">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/50" />
+                  <Input
+                    type="email"
+                    placeholder="Your email"
+                    className="pl-10 bg-background border-border/40 focus:border-primary"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <Button 
+                  type="submit"
+                  disabled={isLoading || !email.trim()}
+                  className="bg-gradient-primary hover:opacity-90 w-full"
+                >
+                  {isLoading ? (  
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Subscribe
+                    </>
+                  ) : (
+                    "Subscribe"
+                  )}
+                </Button>
               </div>
-              <Button className="bg-gradient-primary hover:opacity-90 w-full">
-                Subscribe
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
+            </form>
           </div>
         </div>
 
