@@ -1,7 +1,7 @@
 export interface Database {
   public: {
     Tables: {
-      [`b0b237ee_54c0_4581_9b81_d9e7327dfe6c_newsletter_subscriptions`]: {
+      [`b0b237ee-54c0-4581-9b81-d9e7327dfe6c_newsletter_subscriptions`]: {
         Row: {
           id: number;
           email: string;
@@ -24,7 +24,7 @@ export interface Database {
           user_id?: string | null;
         };
       };
-      [`b0b237ee_54c0_4581_9b81_d9e7327dfe6c_contact_submissions`]: {
+      [`b0b237ee-54c0-4581-9b81-d9e7327dfe6c_contact_submissions`]: {
         Row: {
           id: number;
           full_name: string;
@@ -67,8 +67,8 @@ export interface Database {
 }
 
 // 便于使用的类型别名
-export type NewsletterSubscription = Database['public']['Tables']['b0b237ee_54c0_4581_9b81_d9e7327dfe6c_newsletter_subscriptions']['Row'];
-export type NewsletterSubscriptionInsert = Database['public']['Tables']['b0b237ee_54c0_4581_9b81_d9e7327dfe6c_newsletter_subscriptions']['Insert'];
+export type NewsletterSubscription = Database['public']['Tables']['b0b237ee-54c0-4581-9b81-d9e7327dfe6c_newsletter_subscriptions']['Row'];
+export type NewsletterSubscriptionInsert = Database['public']['Tables']['b0b237ee-54c0-4581-9b81-d9e7327dfe6c_newsletter_subscriptions']['Insert'];
 
-export type ContactSubmission = Database['public']['Tables']['b0b237ee_54c0_4581_9b81_d9e7327dfe6c_contact_submissions']['Row'];
-export type ContactSubmissionInsert = Database['public']['Tables']['b0b237ee_54c0_4581_9b81_d9e7327dfe6c_contact_submissions']['Insert']; 
+export type ContactSubmission = Database['public']['Tables']['b0b237ee-54c0-4581-9b81-d9e7327dfe6c_contact_submissions']['Row'];
+export type ContactSubmissionInsert = Database['public']['Tables']['b0b237ee-54c0-4581-9b81-d9e7327dfe6c_contact_submissions']['Insert']; 

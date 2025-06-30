@@ -20,7 +20,7 @@ const submitContactForm = async (data: ContactSubmissionData): Promise<void> => 
   };
 
   const { error } = await supabase
-    .from('b0b237ee_54c0_4581_9b81_d9e7327dfe6c_contact_submissions')
+    .from('b0b237ee-54c0-4581-9b81-d9e7327dfe6c_contact_submissions')
     .insert(submissionData);
 
   if (error) {

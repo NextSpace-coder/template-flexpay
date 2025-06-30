@@ -15,7 +15,7 @@ const subscribeToNewsletter = async (data: NewsletterSubscribeData): Promise<voi
   };
 
   const { error } = await supabase
-    .from('b0b237ee_54c0_4581_9b81_d9e7327dfe6c_newsletter_subscriptions')
+    .from('b0b237ee-54c0-4581-9b81-d9e7327dfe6c_newsletter_subscriptions')
     .insert(subscriptionData);
 
   if (error) {
