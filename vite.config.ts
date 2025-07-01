@@ -13,7 +13,6 @@ export default defineConfig(({ mode }) => {
       tag: 'script',
       attrs: {
         src: WB_SCRIPT_URL,
-        async: true,
       },
       injectTo: "head",
     }: null;
